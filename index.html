@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+        itt van par otlet: http://www.dwtutorials.com/tutorials/index.php?option=com_content&view=article&id=6216:showcase-of-macintosh-dashboard-widget-ui-designs&catid=98:web-design
+-->
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+    <title>Gadget</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="description" content="" />
+        <meta name="keywords" content="" />
+        <meta property="og:locale" content="en_GB" />
+        <meta property="og:image" content="" />
+        <meta property="og:site_name" content="" />
+        <meta property="og:title" content="" />
+        <meta property="og:type" content="" />
+        <meta property="og:url" content="" />
+        <meta property="fb:app_id" content="" />
+        <meta property="og:description" content=""/>
+        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+<!--
+        <link rel="stylesheet" type="text/css" href="css/theme-clean.css">
+        <script src="js/jquery.simplebox.js"></script>
+        <script src="js/jquery.imgreplace.js"></script>
+        <script src="js/serialize.js"></script>
+        <script src="core/config.obj.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+-->
+        <script src="app/Main.js"></script>
+        <script src="app/ConfigService.js"></script>
+        <script src="app/EventHandler.js"></script>
+        <script src="app/GadgetListComponent.js"></script>
+        <script src="app/GadgetContainerComponent.js"></script>
+        <script src="app/GadgetComponent.js"></script>
+        <script src="app/GadgetLoaderService.js"></script>
+    </head>
+    <body class="theme-clean">
+    <div id="gadget-container">
+    </div>
+    <div id="gadget-list" class="gadget-list"></div>
+
+    <button id="btn-reload">Reload</button>
+
+    <script>
+        var main = new Main();
+        main.run();
+    </script>
+    </body>
+</html>

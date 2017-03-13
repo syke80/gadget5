@@ -1,0 +1,91 @@
+body {
+    background: url(../images/minimalist_metal_wallpaper_by_malkowitch-d5k14s4.jpg);
+}
+
+.gadget-list {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+}
+
+.gadget-list__item {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.gadget-list__item img {
+    width: 100px;
+}
+
+
+.gadget--user-page-view .gadget__button--close-settings {
+    display: none;
+}
+
+.gadget--user-page-view .gadget__settings-page {
+    display: none;
+}
+
+.gadget--settings-page-view .gadget__button--open-settings {
+    display: none;
+}
+
+.gadget--settings-page-view .gadget__user-page {
+    display: none;
+}
+
+.gadget__actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.gadget__button {
+    width: 24px;
+    height: 24px;
+    box-shadow: 2px 2px 5px #000000;
+    cursor: pointer;
+    border: 0px none;
+    text-indent: -10000px;
+    margin-left: 2px;
+}
+
+.gadget__button--close {
+    background: #ffffff url(../images/icon-close.png) no-repeat center center;
+}
+
+.gadget__button--open-settings {
+    background: #ffffff url(../images/icon-settings.png) no-repeat center center;
+}
+
+.gadget__button--close-settings {
+    background: #ffffff url(../images/icon-ok.png) no-repeat center center;
+}
+
+.gadget {
+    position: relative;
+}
+
+.gadget__user-page {
+    display: block;
+    margin: 10px;
+    background: #dddddd;
+    height: calc(100% - 20px);
+}
+
+.gadget__settings-page {
+    display: block;
+    margin: 10px;
+    background: #ffdddd;
+    height: calc(100% - 20px);
+}
+
+.gadget .gadget__actions {
+    opacity: 0;
+}
+
+.gadget:hover .gadget__actions {
+    opacity: 1;
+}
