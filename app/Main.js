@@ -8,7 +8,7 @@ function Main() {
     function initServices() {
         eventHandler = new EventHandler();
         configService = new ConfigService();
-        gadgetLoaderService = new GadgetLoaderService();
+        gadgetLoaderService = new GadgetLoaderService(eventHandler);
     }
 
     function initGadgetContainerComponent() {
@@ -16,7 +16,7 @@ function Main() {
 
         gadgetContainerComponent = new GadgetContainerComponent($("#gadget-container"), eventHandler, gadgetLoaderService, containerConfig);
         eventHandler.subscribe(gadgetContainerComponent.EVENTS.settingsUpdated, function (data) {
-            configService.save(data.id, data.config);
+            configService.save(data);
         });
         gadgetContainerComponent.render();
     }
@@ -33,9 +33,5 @@ function Main() {
         initServices();
         initGadgetContainerComponent();
         initGadgetListComponent();
-
-        $("#btn-reload").click(function () {
-            gadgetContainerComponent.render();
-        });
     }
 }

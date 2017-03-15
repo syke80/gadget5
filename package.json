@@ -1,0 +1,23 @@
+{
+  "name": "gadget",
+  "version": "1.0.0",
+  "description": "web-gadget container platform",
+  "main": "main.js\u001b[H\u001b",
+  "dependencies": {
+    "jasmine": "^2.5.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syke80/gadget5.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/syke80/gadget5/issues"
+  },
+  "homepage": "https://github.com/syke80/gadget5#readme"
+}

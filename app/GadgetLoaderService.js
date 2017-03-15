@@ -1,24 +1,38 @@
-function GadgetLoaderService() {
-    var GADGETS_DIRECTORY = "gadgets",
+function GadgetLoaderService(eventHandler) {
+    var instance = this,
+        GADGETS_DIRECTORY = "gadgets",
         STATUS = {
             loading: 1,
             loaded: 2,
             failed: 3
         },
-        loadedGadgets = [],
-        loadClassIfNeeded,
-        getGadgetClassNameFromDirName;
+        loadedGadgets = [];
 
-    getGadgetClassNameFromDirName = function(dirName) {
+    this.EVENTS = {
+        classLoaded: "GadgetLoaderService-classLoaded"
+    }
+
+    function resolvePendingClassRequire(data, sourceObject, sourceData) {
+        if (data.name === sourceData.name) {
+            sourceData.deferred.resolve();
+        }
+    }
+
+    function getGadgetClassNameFromDirName(dirName) {
         return dirName.charAt(0).toUpperCase() + dirName.slice(1) + "Gadget";
     }
 
-    loadClassIfNeeded = function(name) {
+    function loadClassIfNeeded(name) {
         var deferred = $.Deferred(),
             scriptFilename;
 
-        if (!!loadedGadgets[name]) {
+        if (loadedGadgets[name] === STATUS.loaded) {
             deferred.resolve();
+        } else if (loadedGadgets[name] === STATUS.loading) {
+            eventHandler.subscribe(instance.EVENTS.classLoaded, resolvePendingClassRequire, {
+                name: name,
+                deferred: deferred
+            });
         }
         else {
             loadedGadgets[name] = STATUS.loading;
@@ -27,6 +41,7 @@ function GadgetLoaderService() {
             $.getScript(scriptFilename)
                 .done(function () {
                     loadedGadgets[name] = STATUS.loaded;
+                    eventHandler.trigger(instance.EVENTS.classLoaded, { name: name });
                     deferred.resolve();
                 })
                 .fail(function () {
@@ -41,11 +56,13 @@ function GadgetLoaderService() {
 
     this.getClassByGadgetName = function(name) {
         var deferred = $.Deferred(),
+            requiredClassName,
             requiredClass;
 
         loadClassIfNeeded(name)
             .done( function() {
-                requiredClass = window[getGadgetClassNameFromDirName(name)];
+                requiredClassName = getGadgetClassNameFromDirName(name);
+                requiredClass = window[requiredClassName];
                 deferred.resolve(requiredClass);
             })
             .fail( function() {

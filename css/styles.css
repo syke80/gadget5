@@ -2,6 +2,10 @@ body {
     background: url(../images/minimalist_metal_wallpaper_by_malkowitch-d5k14s4.jpg);
 }
 
+.gadget-container {
+    height: 600px;
+}
+
 .gadget-list {
     position: absolute;
     top: 0;
@@ -18,7 +22,6 @@ body {
 .gadget-list__item img {
     width: 100px;
 }
-
 
 .gadget--user-page-view .gadget__button--close-settings {
     display: none;
@@ -65,7 +68,7 @@ body {
 }
 
 .gadget {
-    position: relative;
+    position: absolute;
 }
 
 .gadget__user-page {

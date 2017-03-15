@@ -1,12 +1,10 @@
 function GadgetContainerComponent($containerElement, eventHandler, gadgetLoaderService, config) {
     var instance = this,
-        gadgets = [];
+        gadgetInstances = [];
 
     this.EVENTS = {
         settingsUpdated: "GadgetContainerComponent-settingsUpdated"
     }
-
-    this.eventHandler = eventHandler;
 
     function getClassByGadgetName(name) {
         var className = name + "Gadget",
@@ -15,100 +13,123 @@ function GadgetContainerComponent($containerElement, eventHandler, gadgetLoaderS
         return requiredClass;
     }
 
-    function getGadgetIndex(gadgetInstance) {
-        var index;
-        for (i in gadgets) {
-            if (!!gadgets[i] && gadgets[i].instance === gadgetInstance) {
-                index = i;
-            }
-        }
-
-        return index;
-    }
-
     function onGadgetClose(data, gadgetInstanceToRemove) {
         var indexOfItemToRemove,
             i;
 
-        indexOfItemToRemove = getGadgetIndex(gadgetInstanceToRemove);
+        console.log("removing gadget", gadgetInstances.indexOf(gadgetInstanceToRemove));
+        return;
+
+        indexOfItemToRemove = gadgetInstances.indexOf(gadgetInstanceToRemove);
         gadgetInstanceToRemove.getContainerElement().remove();
-        gadgets[indexOfItemToRemove] = null;
+        gadgetInstances[indexOfItemToRemove] = null;
+    }
+
+    function getGadgetNameByClassName(className) {
+        var gadgetName = className;
+
+            if (className.lastIndexOf("Gadget") !== -1) {
+                gadgetName = className.slice(0, className.lastIndexOf("Gadget"));
+                gadgetName = gadgetName.charAt(0).toLowerCase() + gadgetName.slice(1);
+            }
+
+        return gadgetName;
+    }
+
+    function getGadgetsCoordinates(gadgetInstance) {
+        var element = gadgetInstance.getContainerElement();
+        return {
+            top: element.css("top"),
+            left: element.css("left")
+        }
+    }
+
+    function triggerUpdatedEvent() {
+        // TODO: is it possible to save modified gadget only?
+        var gadgetContainerItemConfig,
+            gadgetContainerConfig,
+            i;
+
+        gadgetContainerConfig = [];
+        for (i in gadgetInstances) {
+            gadgetContainerItemConfig = {
+                id: i,
+                name: getGadgetNameByClassName(gadgetInstances[i].constructor.name),
+                coordinates: getGadgetsCoordinates(gadgetInstances[i]),
+                gadgetConfig: gadgetInstances[i].getConfig()
+            }
+            gadgetContainerConfig.push(gadgetContainerItemConfig);
+        }
+
+        eventHandler.trigger(instance.EVENTS.settingsUpdated, gadgetContainerConfig);
     }
 
     function onGadgetSettingsUpdated(data, gadgetInstance) {
-        var index = getGadgetIndex(gadgetInstance),
-            dataToStore = {
-                id: index,
-                config: {
-                    name: gadgets[index].name,
-                    coordinates: {
-                        x: 1,
-                        y: 2
-                    },
-                    gadgetConfig: gadgetInstance.getConfig()
-                }
-            }
-        eventHandler.trigger(instance.EVENTS.settingsUpdated, dataToStore);
+        triggerUpdatedEvent();  // TODO: could be called with instance, and could be updated the related data in config
     }
 
-    function renderItem(gadget) {
-        var $gadgetElement,
-            assetsDirectory;
+    function renderItem(gadgetContainerConfig) {
+        var deferred = new $.Deferred(),
+            assetsDirectory,
+            gadgetInstance,
+            $gadgetElement;
 
-        if (gadget === null) {
+        if (!gadgetContainerConfig || !gadgetContainerConfig.name) {
             return;
         }
 
         $gadgetElement = $("<div class=\"gadget\"></div>");
-        gadgetLoaderService.getClassByGadgetName(gadget.name).done(
+        gadgetLoaderService.getClassByGadgetName(gadgetContainerConfig.name).done(
             function(GadgetClass) {
-                assetsDirectory = gadgetLoaderService.getAssetsDirectory(gadget.name);
-                gadget.instance = new GadgetClass($gadgetElement, assetsDirectory, eventHandler);
-                eventHandler.subscribe(gadget.instance.EVENTS.close, onGadgetClose);
-                eventHandler.subscribe(gadget.instance.EVENTS.settingsUpdated, onGadgetSettingsUpdated);
-                gadget.instance.render();
+                assetsDirectory = gadgetLoaderService.getAssetsDirectory(gadgetContainerConfig.name);
+                gadgetInstance = new GadgetClass($gadgetElement, assetsDirectory, eventHandler, gadgetContainerConfig.gadgetConfig);
+                eventHandler.subscribe(gadgetInstance.EVENTS.close, onGadgetClose);
+                eventHandler.subscribe(gadgetInstance.EVENTS.settingsUpdated, onGadgetSettingsUpdated);
+                gadgetInstance.render();
                 $containerElement.append($gadgetElement);
                 $gadgetElement.draggable({
                     snap: true,
-                    containment: $containerElement
+                    containment: "window",
+                    stop: function() { onStopDragging() }
                 });
+                deferred.resolve(gadgetInstance, gadgetContainerConfig);
+            }
+        );
+
+        return deferred;
+    }
+
+    function onStopDragging() {
+        triggerUpdatedEvent();
+    }
+
+    function renderGadgetsInConfig() {
+        var i,
+            itemConfig;
+
+        for (i in config) {
+            itemConfig = config[i];
+            renderItem(itemConfig).done(
+                function(gadgetInstance, gadgetContainerConfig) {
+//                    gadgetInstances[gadgetContainerConfig.id] = gadgetInstance;
+                    gadgetInstances.push(gadgetInstance);
+                    console.log(gadgetContainerConfig.coordinates);
+                    gadgetInstance.getContainerElement().css(gadgetContainerConfig.coordinates);
+                }
+            );
+        }
+    }
+
+    this.add = function(gadgetName) {
+        renderItem({name: gadgetName}).done(
+            function(gadgetInstance) {
+                gadgetInstances.push(gadgetInstance);
+                triggerUpdatedEvent();
             }
         );
     }
 
-    function renderAllItems() {
-        $containerElement.html("");
-
-        gadgets.forEach( function(gadget) {
-            renderItem(gadget);
-        })
-    }
-
-    function loadGadgetsFromConfig() {
-        var i,
-            gadget;
-        for (i in config) {
-            
-        }
-
-    }
-
-    this.initialize = function() {
-        this.render();
-    }
-
-    this.add = function(gadgetName) {
-        var newGadget = {
-            name: gadgetName,
-            instance: null
-        }
-        gadgets.push(newGadget);
-        this.render();
-    }
-
     this.render = function() {
-        renderAllItems();
+        renderGadgetsInConfig();
     }
-
-    this.initialize();
 }

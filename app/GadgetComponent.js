@@ -19,6 +19,12 @@ function GadgetComponent($containerElement, assetsDirectory, eventHandler, confi
         }
     };
 
+    function updateExistingPropertyInConfig(propertyName, value) {
+        if (propertyName in instance.config) {
+            instance.config[propertyName] = value;
+        }
+    }
+
     renderButtons = function($buttonsContainerElement) {
         var $closeButton,
             $openSettingsPageButton,
@@ -65,7 +71,6 @@ function GadgetComponent($containerElement, assetsDirectory, eventHandler, confi
     this.initialize = function() {
         this.config = config || this.defaultConfig;
         showUserPage();
-        console.log("access static from this", GadgetComponent.staticProp);
     }
 
     this.getConfig = function() {
@@ -104,12 +109,6 @@ function GadgetComponent($containerElement, assetsDirectory, eventHandler, confi
 
     this.getContainerElement = function() {
         return $containerElement;
-    }
-
-    function updateExistingPropertyInConfig(propertyName, value) {
-        if (propertyName in instance.config) {
-            instance.config[propertyName] = value;
-        }
     }
 
     this.setDataOnSettingsPage = function() {
