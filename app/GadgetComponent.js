@@ -1,167 +1,166 @@
-function GadgetComponent($containerElement, assetsDirectory, eventHandler, config) {
-    var UNIT_SIZE = 95,
-        USER_PAGE_CLASS = "gadget--user-page-view",
-        SETTINGS_PAGE_CLASS = "gadget--settings-page-view",
-        instance = this,
-        renderButtons,
-        onCloseButtonClick,
-        onOpenSettingsPageButtonClick,
-        onCloseSettingsPageButtonClick,
-        showUserPage,
-        showSettingsPage;
+define(["eventHandler"], function(eventHandler) {
 
-    this.EVENTS = GadgetComponent.EVENTS;
-    this.config = {};
-    this.defaultConfig = {
-        size: {
-            width: 1,
-            height: 1
+    var GadgetComponent = function($containerElement, assetsDirectory, config) {
+        var UNIT_SIZE = 95,
+            USER_PAGE_CLASS = "gadget--user-page-view",
+            SETTINGS_PAGE_CLASS = "gadget--settings-page-view",
+            instance = this;
+
+        this. EVENTS = {
+            close: "GadgetComponent-close",
+            settingsUpdated: "GadgetComponent-settingsUpdated",
+            userPageLoaded: "GadgetComponent-userPageLoaded",
+            settingsPageLoaded: "GadgetComponent-settingsPageLoaded"
+        };
+
+        this.config = {};
+
+        this.defaultConfig = {
+            size: {
+                width: 1,
+                height: 1
+            }
+        };
+
+        function updateExistingPropertyInConfig(propertyName, value) {
+            if (propertyName in instance.config) {
+                instance.config[propertyName] = value;
+            }
         }
-    };
 
-    function updateExistingPropertyInConfig(propertyName, value) {
-        if (propertyName in instance.config) {
-            instance.config[propertyName] = value;
+        function renderButtons($buttonsContainerElement) {
+            var $closeButton,
+                $openSettingsPageButton,
+                $closeSettingsPageButton;
+
+            $closeButton = $("<button class=\"gadget__button gadget__button--close\">Close gadget</button>");
+            $closeButton.click(function () {
+                onCloseButtonClick();
+            });
+            $openSettingsPageButton = $("<button class=\"gadget__button gadget__button--open-settings\">Open settings</button>");
+            $openSettingsPageButton.click(function () {
+                onOpenSettingsPageButtonClick();
+            });
+            $closeSettingsPageButton = $("<button class=\"gadget__button gadget__button--close-settings\">Close settings</button>");
+            $closeSettingsPageButton.click(function () {
+                onCloseSettingsPageButtonClick();
+            });
+            $buttonsContainerElement.append($openSettingsPageButton, $closeSettingsPageButton, $closeButton);
         }
-    }
 
-    renderButtons = function($buttonsContainerElement) {
-        var $closeButton,
-            $openSettingsPageButton,
-            $closeSettingsPageButton;
+        function onCloseButtonClick() {
+            eventHandler.trigger(instance.EVENTS.close, {}, instance);
+        }
 
-        $closeButton = $("<button class=\"gadget__button gadget__button--close\">Close gadget</button>");
-        $closeButton.click(function () {
-            onCloseButtonClick();
-        });
-        $openSettingsPageButton = $("<button class=\"gadget__button gadget__button--open-settings\">Open settings</button>");
-        $openSettingsPageButton.click(function () {
-            onOpenSettingsPageButtonClick();
-        });
-        $closeSettingsPageButton = $("<button class=\"gadget__button gadget__button--close-settings\">Close settings</button>");
-        $closeSettingsPageButton.click(function () {
-            onCloseSettingsPageButtonClick();
-        });
-        $buttonsContainerElement.append($openSettingsPageButton, $closeSettingsPageButton, $closeButton);
-    }
+        function onOpenSettingsPageButtonClick() {
+            instance.setDataOnSettingsPage();
+            showSettingsPage();
+        }
 
-    onCloseButtonClick = function() {
-        eventHandler.trigger(instance.EVENTS.close, {}, instance);
-    }
+        function onCloseSettingsPageButtonClick() {
+            instance.collectDataFromSettingsPage();
+            eventHandler.trigger(instance.EVENTS.settingsUpdated, {}, instance);
+            showUserPage();
+        }
 
-    onOpenSettingsPageButtonClick = function() {
-        instance.setDataOnSettingsPage();
-        showSettingsPage();
-    }
+        function showUserPage() {
+            $containerElement.addClass(USER_PAGE_CLASS).removeClass(SETTINGS_PAGE_CLASS);
+        }
 
-    onCloseSettingsPageButtonClick = function() {
-        instance.collectDataFromSettingsPage();
-        eventHandler.trigger(instance.EVENTS.settingsUpdated, {}, instance);
-        showUserPage();
-    }
+        function showSettingsPage() {
+            $containerElement.addClass(SETTINGS_PAGE_CLASS).removeClass(USER_PAGE_CLASS);
+        }
 
-    showUserPage = function() {
-        $containerElement.addClass(USER_PAGE_CLASS).removeClass(SETTINGS_PAGE_CLASS);
-    }
+        this.initialize = function() {
+            this.config = config || this.defaultConfig;
+            showUserPage();
+        }
 
-    showSettingsPage = function() {
-        $containerElement.addClass(SETTINGS_PAGE_CLASS).removeClass(USER_PAGE_CLASS);
-    }
+        this.getConfig = function() {
+            return this.config;
+        }
 
-    this.initialize = function() {
-        this.config = config || this.defaultConfig;
-        showUserPage();
-    }
+        this.render = function() {
+            var $buttonsContainerElement,
+                $userPageContainerElement,
+                $settingsPageContainerElement;
 
-    this.getConfig = function() {
-        return this.config;
-    }
+            $containerElement.width(this.config.size.width * UNIT_SIZE);
+            $containerElement.height(this.config.size.height * UNIT_SIZE);
 
-    this.render = function() {
-        var $buttonsContainerElement,
-            $userPageContainerElement,
-            $settingsPageContainerElement;
+            $buttonsContainerElement = $("<section class=\"gadget__actions\"></section>");
+            $userPageContainerElement = $("<section class=\"gadget__user-page\"></section>");
+            $settingsPageContainerElement = $("<section class=\"gadget__settings-page\"></section>");
 
-        $containerElement.width(this.config.size.width * UNIT_SIZE);
-        $containerElement.height(this.config.size.height * UNIT_SIZE);
+            renderButtons($buttonsContainerElement);
+            this.renderUserPage($userPageContainerElement);
+            this.renderSettingsPage($settingsPageContainerElement);
 
-        $buttonsContainerElement = $("<section class=\"gadget__actions\"></section>");
-        $userPageContainerElement = $("<section class=\"gadget__user-page\"></section>");
-        $settingsPageContainerElement = $("<section class=\"gadget__settings-page\"></section>");
+            $containerElement.html("");
+            $containerElement.append($buttonsContainerElement, $userPageContainerElement, $settingsPageContainerElement);
 
-        renderButtons($buttonsContainerElement);
-        this.renderUserPage($userPageContainerElement);
-        this.renderSettingsPage($settingsPageContainerElement);
+            showUserPage();
+        }
 
-        $containerElement.html("");
-        $containerElement.append($buttonsContainerElement, $userPageContainerElement, $settingsPageContainerElement);
+        this.renderUserPage = function($userPageContainerElement) {
+            $userPageContainerElement.html("gadget default content");
+        }
 
-        showUserPage();
-    }
+        this.renderSettingsPage = function($settingsPageContainerElement) {
+            $settingsPageContainerElement.html("default settings page");
+        }
 
-    this.renderUserPage = function($userPageContainerElement) {
-        $userPageContainerElement.html("gadget default content");
-    }
+        this.getContainerElement = function() {
+            return $containerElement;
+        }
 
-    this.renderSettingsPage = function($settingsPageContainerElement) {
-        $settingsPageContainerElement.html("default settings page");
-    }
+        this.setDataOnSettingsPage = function() {
+            var name,
+                value,
+                $inputElement;
 
-    this.getContainerElement = function() {
-        return $containerElement;
-    }
+            $("select, textarea, input[type=text], input:not([type]), input[type=radio], input[type=checkbox]", $containerElement).each( function(index, inputElement) {
+                $inputElement = $(inputElement);
+                name = $inputElement.attr("name");
+                value = instance.config[name];
 
-    this.setDataOnSettingsPage = function() {
-        var name,
-            value,
-            $inputElement;
-
-        $("select, textarea, input[type=text], input:not([type]), input[type=radio], input[type=checkbox]", $containerElement).each( function(index, inputElement) {
-            $inputElement = $(inputElement);
-            name = $inputElement.attr("name");
-            value = instance.config[name];
-
-            if (($inputElement).is(':checkbox')) {
-                if (value === null) {
-                    value = false;
-                }
-                $inputElement.prop("checked", value);
-            } else if (($inputElement).is(':radio')) {
-                if ($inputElement.val() == value) {
-                    $inputElement.prop("checked", true);
+                if (($inputElement).is(':checkbox')) {
+                    if (value === null) {
+                        value = false;
+                    }
+                    $inputElement.prop("checked", value);
+                } else if (($inputElement).is(':radio')) {
+                    if ($inputElement.val() == value) {
+                        $inputElement.prop("checked", true);
+                    } else {
+                        $inputElement.prop("checked", false);
+                    }
                 } else {
-                    $inputElement.prop("checked", false);
+                    $inputElement.val(value);
                 }
-            } else {
-                $inputElement.val(value);
-            }
-        });
+            });
+        }
+
+        this.collectDataFromSettingsPage = function() {
+            var name,
+                value,
+                $inputElement;
+
+            $("select, textarea, input[type=text], input:not([type]), input[type=radio]:checked, input[type=checkbox]", $containerElement).each( function(index, inputElement) {
+                $inputElement = $(inputElement);
+                name = $inputElement.attr("name");
+                if (($inputElement).is(':checkbox')) {
+                    value = $inputElement.prop("checked") ? true : false;
+                } else {
+                    value = $inputElement.val();
+                }
+
+                updateExistingPropertyInConfig(name, value);
+            });
+        }
+
+        this.initialize();
     }
 
-    this.collectDataFromSettingsPage = function() {
-        var name,
-            value,
-            $inputElement;
-
-        $("select, textarea, input[type=text], input:not([type]), input[type=radio]:checked, input[type=checkbox]", $containerElement).each( function(index, inputElement) {
-            $inputElement = $(inputElement);
-            name = $inputElement.attr("name");
-            if (($inputElement).is(':checkbox')) {
-                value = $inputElement.prop("checked") ? true : false;
-            } else {
-                value = $inputElement.val();
-            }
-
-            updateExistingPropertyInConfig(name, value);
-        });
-    }
-
-    this.initialize();
-}
-
-GadgetComponent.EVENTS = {
-    close: "GadgetComponent-close",
-    settingsUpdated: "GadgetComponent-settingsUpdated",
-    userPageLoaded: "GadgetComponent-userPageLoaded",
-    settingsPageLoaded: "GadgetComponent-settingsPageLoaded"
-}
+    return GadgetComponent;
+})

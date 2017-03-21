@@ -1,34 +1,36 @@
-function GadgetListComponent(containerElement, eventHandler) {
-    var instance = this,
-        containerElement = containerElement,
-        eventHandler = eventHandler;
+define(["eventHandler"], function(eventHandler) {
+    var GadgetListComponent = function($containerElement) {
+        var instance = this;
 
-    this.EVENTS = {
-            add: "GadgetListComponent-add"
-        };
+        this.EVENTS = {
+                add: "GadgetListComponent-add"
+            };
 
-    var renderList = function(gadgetList) {
-        var newItem;
+        function renderList(gadgetList) {
+            var newItem;
 
-        containerElement.html("");
+            $containerElement.html("");
 
-        gadgetList.forEach( function(gadgetName) {
-            newItem = $("<button class=\"gadget-list__item\"><img src=\"gadgets/" + gadgetName + "/icon.png\"></button>");
-            newItem.click( function() {
-                eventHandler.trigger(instance.EVENTS.add, { gadgetName: gadgetName });
+            gadgetList.forEach( function(gadgetName) {
+                newItem = $("<button class=\"gadget-list__item\"><img src=\"gadgets/" + gadgetName + "/icon.png\"></button>");
+                newItem.click( function() {
+                    eventHandler.trigger(instance.EVENTS.add, { gadgetName: gadgetName });
+                });
+                $containerElement.append(newItem);
             });
-            containerElement.append(newItem);
-        });
+        }
+
+        this.load = function() {
+            $.get({
+                url: "./gadgetlist.php",
+                context: this
+            }).done(
+                function(gadgetList) {
+                    renderList(gadgetList);
+                }
+            );
+        }
     }
 
-    this.load = function() {
-        $.get({
-            url: "./gadgetlist.php",
-            context: this
-        }).done(
-            function(gadgetList) {
-                renderList(gadgetList);
-            }
-        );
-    }
-}
+    return GadgetListComponent;
+})
