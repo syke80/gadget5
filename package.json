@@ -4,9 +4,12 @@
   "description": "web-gadget container platform",
   "main": "main.js\u001b[H\u001b",
   "dependencies": {
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "requirejs": "^2.3.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jasmine-core": "^2.5.2"
+  },
   "scripts": {
     "test": "jasmine"
   },

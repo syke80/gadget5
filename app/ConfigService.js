@@ -1,19 +1,17 @@
-function ConfigService() {
-/*
-    this.save = function(id, properties) {
-        var serializedConfig = localStorage.getItem("config") || "{}",
-            config =  JSON.parse(serializedConfig);
-        config[id] = properties;
-        localStorage.setItem("config", JSON.stringify(config));
-    }
-*/
-    this.save = function(properties) {
-        localStorage.setItem("config", JSON.stringify(properties));
+define( function() {
+    var configService = {
+        LOCAL_STORAGE_KEY: "config",
+
+        save: function(properties) {
+            localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(properties));
+        },
+
+        getAll: function() {
+            var serializedConfig = localStorage.getItem(this.LOCAL_STORAGE_KEY) || "{}",
+                config =  JSON.parse(serializedConfig);
+            return config;
+        }
     }
 
-    this.getAll = function() {
-        var serializedConfig = localStorage.getItem("config") || "{}",
-            config =  JSON.parse(serializedConfig);
-        return config;
-    }
-}
+    return configService;
+})
