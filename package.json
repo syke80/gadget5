@@ -2,7 +2,7 @@
   "name": "gadget",
   "version": "1.0.0",
   "description": "web-gadget container platform",
-  "main": "main.js\u001b[H\u001b",
+  "main": "app/main.js",
   "dependencies": {
     "jasmine": "^2.5.3"
   },
