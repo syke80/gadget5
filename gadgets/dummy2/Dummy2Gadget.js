@@ -18,11 +18,11 @@ define(["GadgetComponent"], function(GadgetComponent) {
         this.config = config || this.defaultConfig;
 
         this.renderUserPage = function($userPageContainerElement) {
-            $userPageContainerElement.load(assetsDirectory + "/gadget.html");
+            this.$userPageContainerElement.load(assetsDirectory + "/gadget.html");
         }
 
         this.renderSettingsPage = function($settingsPageContainerElement) {
-            $settingsPageContainerElement.load(assetsDirectory + "/settings.html");
+            this.$settingsPageContainerElement.load(assetsDirectory + "/settings.html");
         }
     }
 

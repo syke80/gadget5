@@ -2,8 +2,8 @@ define(["GadgetComponent"], function(GadgetComponent) {
     var Dummy1Gadget = function($containerElement, assetsDirectory, config) {
         GadgetComponent.call(this, $containerElement, assetsDirectory, config); // call super constructor.
 
-        this.renderUserPage = function($userPageContainerElement) {
-            $userPageContainerElement.html("Dummy 1 gadget content");
+        this.renderUserPage = function() {
+            this.$userPageContainerElement.html("Dummy 1 gadget content");
         }
     }
 

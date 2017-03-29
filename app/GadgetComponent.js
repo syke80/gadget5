@@ -6,6 +6,10 @@ define(["eventHandler"], function(eventHandler) {
             SETTINGS_PAGE_CLASS = "gadget--settings-page-view",
             instance = this;
 
+        this.$buttonsContainerElement = null;
+        this.$userPageContainerElement = null;
+        this.$settingsPageContainerElement = null;
+
         this. EVENTS = {
             close: "GadgetComponent-close",
             settingsUpdated: "GadgetComponent-settingsUpdated",
@@ -28,8 +32,9 @@ define(["eventHandler"], function(eventHandler) {
             }
         }
 
-        function renderButtons($buttonsContainerElement) {
-            var $closeButton,
+        function renderButtons() {
+            var $buttonsContainerElement = instance.$buttonsContainerElement,
+                $closeButton,
                 $openSettingsPageButton,
                 $closeSettingsPageButton;
 
@@ -81,33 +86,29 @@ define(["eventHandler"], function(eventHandler) {
         }
 
         this.render = function() {
-            var $buttonsContainerElement,
-                $userPageContainerElement,
-                $settingsPageContainerElement;
-
             $containerElement.width(this.config.size.width * UNIT_SIZE);
             $containerElement.height(this.config.size.height * UNIT_SIZE);
 
-            $buttonsContainerElement = $("<section class=\"gadget__actions\"></section>");
-            $userPageContainerElement = $("<section class=\"gadget__user-page\"></section>");
-            $settingsPageContainerElement = $("<section class=\"gadget__settings-page\"></section>");
+            this.$buttonsContainerElement = $("<section class=\"gadget__actions\"></section>");
+            this.$userPageContainerElement = $("<section class=\"gadget__user-page\"></section>");
+            this.$settingsPageContainerElement = $("<section class=\"gadget__settings-page\"></section>");
 
-            renderButtons($buttonsContainerElement);
-            this.renderUserPage($userPageContainerElement);
-            this.renderSettingsPage($settingsPageContainerElement);
+            renderButtons();
+            this.renderUserPage();
+            this.renderSettingsPage();
 
             $containerElement.html("");
-            $containerElement.append($buttonsContainerElement, $userPageContainerElement, $settingsPageContainerElement);
+            $containerElement.append(this.$buttonsContainerElement, this.$userPageContainerElement, this.$settingsPageContainerElement);
 
             showUserPage();
         }
 
-        this.renderUserPage = function($userPageContainerElement) {
-            $userPageContainerElement.html("gadget default content");
+        this.renderUserPage = function() {
+            this.$userPageContainerElement.html("gadget default content");
         }
 
         this.renderSettingsPage = function($settingsPageContainerElement) {
-            $settingsPageContainerElement.html("default settings page");
+            this.$settingsPageContainerElement.html("default settings page");
         }
 
         this.getContainerElement = function() {
