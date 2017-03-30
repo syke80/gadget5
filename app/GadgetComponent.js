@@ -1,16 +1,23 @@
-define(["eventHandler"], function(eventHandler) {
+define(["eventHandler"], function(appEventHandler) {
 
     var GadgetComponent = function($containerElement, assetsDirectory, config) {
         var UNIT_SIZE = 95,
-            USER_PAGE_CLASS = "gadget--user-page-view",
-            SETTINGS_PAGE_CLASS = "gadget--settings-page-view",
+            USER_PAGE_CSS_CLASS = "gadget--user-page-view",
+            SETTINGS_PAGE_CSS_CLASS = "gadget--settings-page-view",
             instance = this;
 
+        this.LOCALEVENTS = {
+            userPageLoaded: "userPageLoaded",
+            settingsPageLoaded: "settingsPageLoaded"
+        },
+        this.$localEventHandler = $(this),
+        this.isSettingsPageLoaded = false;
+        this.isUserPageLoaded = false;
         this.$buttonsContainerElement = null;
         this.$userPageContainerElement = null;
         this.$settingsPageContainerElement = null;
 
-        this. EVENTS = {
+        this.EVENTS = {
             close: "GadgetComponent-close",
             settingsUpdated: "GadgetComponent-settingsUpdated",
             userPageLoaded: "GadgetComponent-userPageLoaded",
@@ -54,7 +61,7 @@ define(["eventHandler"], function(eventHandler) {
         }
 
         function onCloseButtonClick() {
-            eventHandler.trigger(instance.EVENTS.close, {}, instance);
+            appEventHandler.trigger(instance.EVENTS.close, {}, instance);
         }
 
         function onOpenSettingsPageButtonClick() {
@@ -64,20 +71,21 @@ define(["eventHandler"], function(eventHandler) {
 
         function onCloseSettingsPageButtonClick() {
             instance.collectDataFromSettingsPage();
-            eventHandler.trigger(instance.EVENTS.settingsUpdated, {}, instance);
+            appEventHandler.trigger(instance.EVENTS.settingsUpdated, {}, instance);
             showUserPage();
         }
 
         function showUserPage() {
-            $containerElement.addClass(USER_PAGE_CLASS).removeClass(SETTINGS_PAGE_CLASS);
+            $containerElement.addClass(USER_PAGE_CSS_CLASS).removeClass(SETTINGS_PAGE_CSS_CLASS);
         }
 
         function showSettingsPage() {
-            $containerElement.addClass(SETTINGS_PAGE_CLASS).removeClass(USER_PAGE_CLASS);
+            $containerElement.addClass(SETTINGS_PAGE_CSS_CLASS).removeClass(USER_PAGE_CSS_CLASS);
         }
 
-        this.initialize = function() {
-            this.config = config || this.defaultConfig;
+        function initialize() {
+            instance.config = config || instance.defaultConfig;
+            attachEvents();
             showUserPage();
         }
 
@@ -160,7 +168,22 @@ define(["eventHandler"], function(eventHandler) {
             });
         }
 
-        this.initialize();
+        this.onUserPageLoaded = function() {}
+        this.onSettingsPageLoaded = function() {}
+
+        function attachEvents() {
+            instance.$localEventHandler.on(instance.LOCALEVENTS.userPageLoaded, function() {
+                this.isUserPageLoaded = true;
+                this.onUserPageLoaded();
+            });
+
+            instance.$localEventHandler.on(instance.LOCALEVENTS.settingsPageLoaded, function() {
+                this.isSettingsPageLoaded = true;
+                this.onSettingsPageLoaded();
+            });
+        }
+
+        initialize();
     }
 
     return GadgetComponent;

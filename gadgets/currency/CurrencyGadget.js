@@ -1,42 +1,29 @@
 define(["GadgetComponent"], function(GadgetComponent) {
     var CurrencyGadget = function($containerElement, assetsDirectory, config) {
         var instance = this,
-            EVENTS = {
-                USER_PAGE_LOADED: "1",
-                SETTINGS_PAGE_LOADED: "2",
-                CURRENCIES_FETCHED: "3",
-                CURRENCY_VALUE_TYPED: "4"
-            },
-            isSettingsPageLoaded = false,
-            isCurrenciesFetched = false,
-            isUserPageLoaded = false,
-            $eventHandler = $(this),
             availableCurrencies = [];
 
         GadgetComponent.call(this, $containerElement, assetsDirectory, config); // call super constructor.
 
-        $.extend(this.defaultConfig, {
-            size: {
-                width: 3,
-                height: 3
-            },
-            currencies: []
-        });
-
-        this.config = config || this.defaultConfig;
-
-        function attachSettingsPageEvents() {
-            var selectedCurrency;
-            $("form", this.$settingsPageContainerElement).submit( function(event) {
-                event.preventDefault();
-                $targetElement = $(event.target);
-                selectedCurrency = $("select[name=currency]", $targetElement).val()
-                if (!!selectedCurrency) {
-                    instance.config.currencies.push(selectedCurrency);
-                }
-                renderCurrencyListOnSettingsPage();
-                renderCurrencyListOnUserPage();
+        function initialize() {
+            $.extend(instance.defaultConfig, {
+                size: {
+                    width: 3,
+                    height: 3
+                },
+                currencies: []
             });
+
+            $.extend(instance.LOCALEVENTS, {
+                currenciesFetched: "currenciesFetched",
+                currencyValueTyped: "currencyValueTyped"
+            });
+
+            instance.config = config || instance.defaultConfig;
+            instance.isCurrenciesFetched = false;
+
+            getAvailableCurrencies();
+            attachGadgetEvents();
         }
 
         this.onSettingsPageLoaded = function() {
@@ -49,35 +36,39 @@ define(["GadgetComponent"], function(GadgetComponent) {
             renderCurrencyListOnUserPage();
         }
 
-        $eventHandler.on(EVENTS.SETTINGS_PAGE_LOADED, function() {
-            isSettingsPageLoaded = true;
-            this.onSettingsPageLoaded();
-        });
-
-        $eventHandler.on(EVENTS.CURRENCIES_FETCHED, function() {
-            isCurrenciesFetched = true;
-        });
-
-        $eventHandler.on(EVENTS.USER_PAGE_LOADED, function() {
-            isUserPageLoaded = true;
-            this.onUserPageLoaded();
-        });
-
-        $eventHandler.on(EVENTS.CURRENCIES_FETCHED, function() {
-            renderDynamicElementsIfPossible();
-        });
-
-        getAvailableCurrencies();
-
         this.renderUserPage = function() {
             this.$userPageContainerElement.load(assetsDirectory + "/gadget.html", function() {
-                $eventHandler.trigger(EVENTS.USER_PAGE_LOADED);
+                instance.$localEventHandler.trigger(instance.LOCALEVENTS.userPageLoaded);
             });
         }
 
         this.renderSettingsPage = function() {
             this.$settingsPageContainerElement.load(assetsDirectory + "/settings.html", function() {
-                $eventHandler.trigger(EVENTS.SETTINGS_PAGE_LOADED);
+                instance.$localEventHandler.trigger(instance.LOCALEVENTS.settingsPageLoaded);
+            });
+        }
+
+        function attachGadgetEvents() {
+            instance.$localEventHandler.on(instance.LOCALEVENTS.currenciesFetched, function() {
+                instance.isCurrenciesFetched = true;
+            });
+
+            instance.$localEventHandler.on(instance.LOCALEVENTS.currenciesFetched, function() {
+                renderDynamicElementsIfPossible();
+            });
+        }
+
+        function attachSettingsPageEvents() {
+            var selectedCurrency;
+            $("form", this.$settingsPageContainerElement).submit( function(event) {
+                event.preventDefault();
+                $targetElement = $(event.target);
+                selectedCurrency = $("select[name=currency]", $targetElement).val()
+                if (!!selectedCurrency) {
+                    instance.config.currencies.push(selectedCurrency);
+                }
+                renderCurrencyListOnSettingsPage();
+                renderCurrencyListOnUserPage();
             });
         }
 
@@ -107,7 +98,7 @@ define(["GadgetComponent"], function(GadgetComponent) {
                 url: "currency-mock.json",
                 success: function(data) {
                     availableCurrencies = convertResponseToCurrencies(data);
-                    $eventHandler.trigger(EVENTS.CURRENCIES_FETCHED);
+                    instance.$localEventHandler.trigger(instance.LOCALEVENTS.currenciesFetched);
                 }
             });
             /*
@@ -182,9 +173,9 @@ define(["GadgetComponent"], function(GadgetComponent) {
                     $item.attr("data-currency", currencyName);
                     $item.keyup({index: i, currencyName: currencyName}, function(event) {
                         var value = $(event.target).val();
-                        $eventHandler.trigger(EVENTS.CURRENCY_VALUE_TYPED, {index: event.data.index, currencyName: event.data.currencyName, value: value });
+                        instance.$localEventHandler.trigger(instance.LOCALEVENTS.currencyValueTyped, {index: event.data.index, currencyName: event.data.currencyName, value: value });
                     });
-                    $eventHandler.on(EVENTS.CURRENCY_VALUE_TYPED, {index: i, currencyName: currencyName, $item: $item}, function(event, triggerData) {
+                    instance.$localEventHandler.on(instance.LOCALEVENTS.currencyValueTyped, {index: i, currencyName: currencyName, $item: $item}, function(event, triggerData) {
                         updateValue(event.data, triggerData);
                     });
                     $("button", $item).click({index: i}, function (event) {
@@ -217,7 +208,7 @@ define(["GadgetComponent"], function(GadgetComponent) {
         }
 
         function renderDynamicElementsIfPossible() {
-            if (isSettingsPageLoaded && isCurrenciesFetched) {
+            if (instance.isSettingsPageLoaded && instance.isCurrenciesFetched) {
                 renderDynamicElements();
             }
         }
@@ -234,6 +225,7 @@ define(["GadgetComponent"], function(GadgetComponent) {
             }
         }
 
+        initialize();
     }
 
     CurrencyGadget.prototype = Object.create(GadgetComponent.prototype);
