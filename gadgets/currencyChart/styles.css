@@ -1,0 +1,29 @@
+.gadget--name--currencyChart .rates {
+    position: relative;
+    height: 1.2em;
+    background: white;
+    border-bottom: 1px solid #999999;
+}
+
+.gadget--name--currencyChart .rates .bid,
+.gadget--name--currencyChart .rates .rate,
+.gadget--name--currencyChart .rates .ask {
+    position: absolute;
+    top: 0em;
+    left: 0;
+    width: 100%;
+    height: 1em;
+    box-sizing: border-box;
+}
+
+.gadget--name--currencyChart .rates .rate {
+    text-align: center;
+}
+
+.gadget--name--currencyChart .rates .ask {
+    text-align: right;
+}
+
+.gadget--name--currencyChart .chart img {
+    width: 100%;
+}

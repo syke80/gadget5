@@ -13,11 +13,12 @@ try {
         return;
     }
     $url = $_GET['url'];
-    $expire = $_GET['expire'] ?: 0;
-    $gateway = new Gateway(new Curl(), $cache, $_GET['url'], $_GET['expire']);
+    $getParameters = isset($_GET['getParameters']) ? $_GET['getParameters'] : [];
+    $expire = isset($_GET['expire']) ? $_GET['expire'] : 0;
+    $gateway = new Gateway(new Curl(), $cache, $url, $getParameters, $expire);
 } catch(Exception $exception) {
     echo $exception;
 }
 
-//header('Content-Type: application/json');
+header('Content-Type: application/json');
 echo $gateway->getResponse($cache);
