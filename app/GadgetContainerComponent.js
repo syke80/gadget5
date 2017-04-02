@@ -74,6 +74,7 @@ define(["jquery", "jqueryui", "eventHandler", "gadgetLoaderService"], function($
             }
 
             $gadgetElement = $("<div class=\"gadget\"></div>");
+            $gadgetElement.addClass("gadget--name--" + gadgetContainerConfig.name);
             gadgetLoaderService.getClassByGadgetName(gadgetContainerConfig.name).done(
                 function(GadgetClass) {
                     assetsDirectory = gadgetLoaderService.getAssetsDirectory(gadgetContainerConfig.name);

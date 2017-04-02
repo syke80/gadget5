@@ -3,7 +3,7 @@ define(["GadgetComponent"], function(GadgetComponent) {
         GadgetComponent.call(this, $containerElement, assetsDirectory, config); // call super constructor.
 
         this.renderUserPage = function() {
-            this.$userPageContainerElement.html("Dummy 1 gadget content");
+            this.$userPageContainerElement.html("Dummy 1 gadget <span class=\"myclass\">content</span>");
         }
     }
 
