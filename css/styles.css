@@ -1,5 +1,46 @@
 body {
     background: url(../images/minimalist_metal_wallpaper_by_malkowitch-d5k14s4.jpg);
+    font-family: Arial;
+}
+
+.gadget--width-1 {
+    width: 95px;
+}
+
+.gadget--width-2 {
+    width: 190px;
+}
+
+.gadget--width-3 {
+    width: 285px;
+}
+
+.gadget--width-4 {
+    width: 380px;
+}
+
+.gadget--width-5 {
+    width: 475px;
+}
+
+.gadget--height-1 {
+    height: 95px;
+}
+
+.gadget--height-2 {
+    height: 190px;
+}
+
+.gadget--height-3 {
+    height: 285px;
+}
+
+.gadget--height-4 {
+    height: 380px;
+}
+
+.gadget--height-5 {
+    height: 475px;
 }
 
 .gadget-container {

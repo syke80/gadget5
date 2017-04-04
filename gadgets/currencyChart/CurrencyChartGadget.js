@@ -9,10 +9,6 @@ define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHa
         GadgetComponent.call(this, $containerElement, assetsDirectory, config); // call super constructor.
 
         $.extend(this.defaultConfig, {
-            size: {
-                width: 3,
-                height: 2
-            },
             currency1: "EUR",
             currency2: "USD",
             range: "1m",
@@ -20,13 +16,23 @@ define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHa
         });
 
         this.config = config || this.defaultConfig;
-        this.config.size = sizeMapping[this.config.sizeText];
+        setDimensionsInConfig();
 
         appEventHandler.subscribe(instance.EVENTS.settingsUpdated, function (data, sourceObject) {
             if (sourceObject === instance) {
-                instance.renderUserPage();
+                onSettingsUpdated();
             }
         });
+
+        function setDimensionsInConfig() {
+            instance.config.size = sizeMapping[instance.config.sizeText];
+        }
+
+        function onSettingsUpdated() {
+            instance.renderUserPage();
+            setDimensionsInConfig();
+            instance.updateDimensions();
+        }
 
         function downloadCurrentRates() {
             var deferred = $.Deferred(),

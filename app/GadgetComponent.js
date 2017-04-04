@@ -4,6 +4,8 @@ define(["eventHandler"], function(appEventHandler) {
         var UNIT_SIZE = 95,
             USER_PAGE_CSS_CLASS = "gadget--user-page-view",
             SETTINGS_PAGE_CSS_CLASS = "gadget--settings-page-view",
+            sizeToWidthClassMapping = ["", "gadget--width-1", "gadget--width-2", "gadget--width-3", "gadget--width-4", "gadget--width-5"],
+            sizeToHeightClassMapping = ["", "gadget--height-1", "gadget--height-2", "gadget--height-3", "gadget--height-4", "gadget--height-5"],
             instance = this;
 
         this.LOCALEVENTS = {
@@ -93,9 +95,15 @@ define(["eventHandler"], function(appEventHandler) {
             return this.config;
         }
 
+        this.updateDimensions = function() {
+            $containerElement.removeClass(sizeToWidthClassMapping.join(" "));
+            $containerElement.removeClass(sizeToHeightClassMapping.join(" "));
+            $containerElement.addClass(sizeToWidthClassMapping[this.config.size.width]);
+            $containerElement.addClass(sizeToHeightClassMapping[this.config.size.height]);
+        }
+
         this.render = function() {
-            $containerElement.width(this.config.size.width * UNIT_SIZE);
-            $containerElement.height(this.config.size.height * UNIT_SIZE);
+            this.updateDimensions();
 
             this.$buttonsContainerElement = $("<section class=\"gadget__actions\"></section>");
             this.$userPageContainerElement = $("<section class=\"gadget__user-page\"></section>");
@@ -115,7 +123,7 @@ define(["eventHandler"], function(appEventHandler) {
             this.$userPageContainerElement.html("gadget default content");
         }
 
-        this.renderSettingsPage = function($settingsPageContainerElement) {
+        this.renderSettingsPage = function() {
             this.$settingsPageContainerElement.html("default settings page");
         }
 
