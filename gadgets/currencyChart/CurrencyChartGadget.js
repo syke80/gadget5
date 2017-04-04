@@ -1,6 +1,10 @@
 define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHandler) {
     var CurrencyChartGadget = function($containerElement, assetsDirectory, config) {
         var instance = this,
+            chartImageSizeMapping = {
+                'medium' : 's',
+                'large' : 'm'
+            },
             sizeMapping = {
                 'medium': { width: 3, height: 2 },
                 'large': { width: 4, height: 3 }
@@ -68,7 +72,8 @@ define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHa
         }
 
         function downloadUserPageDynamicContent() {
-            var chartUrl = "http://chart.finance.yahoo.com/z?s=" + instance.config.currency1 + instance.config.currency2 + "=X&t=1y&l=on&z=s&q=l&c=";
+            var sizeLetter = chartImageSizeMapping[instance.config.sizeText],
+                chartUrl = "http://chart.finance.yahoo.com/z?s=" + instance.config.currency1 + instance.config.currency2 + "=X&t=" + instance.config.range + "&l=on&z=" + sizeLetter + "&q=l&c=";
 
             $("img", instance.$userPageContainerElement).attr("src", chartUrl);
         }
