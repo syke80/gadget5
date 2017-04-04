@@ -55,7 +55,6 @@ define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHa
                     getParameters: getParameters
                 },
                 success: function (data) {
-                    console.log(data);
                     deferred.resolve({
                         ask: parseFloat(data.query.results.rate.Ask).toFixed(2),
                         bid: parseFloat(data.query.results.rate.Bid).toFixed(2),
@@ -81,7 +80,6 @@ define(["GadgetComponent", "eventHandler"], function(GadgetComponent, appEventHa
                     $(".ask", instance.$userPageContainerElement).html(rate.ask);
                     $(".bid", instance.$userPageContainerElement).html(rate.bid);
                     $(".rate", instance.$userPageContainerElement).html(rate.rate);
-                    console.log("rate", rate);
                 });
             });
         }

@@ -85,8 +85,8 @@ define(["GadgetComponent"], function(GadgetComponent) {
 
             for (i in response) {
                 currencies.push( {
-                    name: response[i]["-currency"],
-                    rate: response[i]["-rate"]
+                    name: response[i]["@attributes"]["currency"],
+                    rate: response[i]["@attributes"]["rate"]
                 });
             }
 
@@ -94,41 +94,17 @@ define(["GadgetComponent"], function(GadgetComponent) {
         }
 
         function getAvailableCurrencies() {
-            $.ajax({
-                url: "currency-mock.json",
+            $.get({
+                url: "gateway/",
+                data: {
+                    url: "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml",
+                    expires: "3600"
+                },
                 success: function(data) {
                     availableCurrencies = convertResponseToCurrencies(data);
                     instance.$localEventHandler.trigger(instance.LOCALEVENTS.currenciesFetched);
                 }
             });
-            /*
-            $.ajax({
-                url:  "interface.php",
-                type: "GET",
-                data: {
-                    type:    "xml",
-                    cache:   "currency",
-                    expires: "3600",
-                    url:     "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-                },
-                success: function(data) {
-                    var currencyList = data["Cube"]["Cube"]["Cube"];
-                    var eur = new Array();
-                    eur["@attributes"] = new Array();
-                    eur["@attributes"]["currency"] = "EUR";
-                    eur["@attributes"]["rate"] = "1";
-                    currencyList.push(eur);
-                    currencyList.sort( function(a,b) {return a["@attributes"]["currency"] > b["@attributes"]["currency"] } );
-
-                    for (i in currencyList) {
-                        currencyDB[currencyList[i]["@attributes"]["currency"]] = currencyList[i]["@attributes"]["rate"];
-                    }
-                    if (callback !== undefined) callback();
-                },
-                dataType: "json",
-            });
-            */
-
         }
 
         function removeCurrency(index) {
@@ -151,10 +127,6 @@ define(["GadgetComponent"], function(GadgetComponent) {
             if (listenerData.index == triggerData.index) {
                 return;
             }
-            /*
-            listenerData.$item
-            listenerData.index
-            */
             var valueInEuro = triggerData.currencyName === "EUR" ? triggerData.value : triggerData.value / getRate(triggerData.currencyName),
                 valueInRequiredCurrency = valueInEuro * getRate(listenerData.currencyName);
             $("input", listenerData.$item).val(valueInRequiredCurrency);

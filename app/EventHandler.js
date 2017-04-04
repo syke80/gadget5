@@ -23,7 +23,6 @@ define( function() {
             }
 
             if (events[eventId].subscribers.indexOf(callback) === -1) {
-                console.log("subscribe", eventId);
                 events[eventId].subscribers.push(callback);
             }
         },
@@ -32,7 +31,6 @@ define( function() {
             var event = events[eventId];
 
             if (!!event) {
-                console.log("trigger", eventId);
                 event.subscribers.forEach(function (callback) {
                     callback(data, sourceObject);
                 });

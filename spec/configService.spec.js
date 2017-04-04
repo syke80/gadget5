@@ -19,14 +19,7 @@ requirejs.config({
 
 });
 
-console.log("debug1");
-
-requirejs([], function() {
-    console.log("debug-qweqweeqw");
-});
-
 requirejs(['configService'], function(configService) {
-console.log("debug2");
     describe("configService", function () {
         var LOCAL_STORAGE_KEY = "config",
             PROPERTIES = "fake properties",
@@ -34,10 +27,8 @@ console.log("debug2");
             EMPTY_OBJECT = {},
             INVALID_JSON_STRING = "qwe";
 
-console.log("debug3");
         describe(".save", function () {
             it("should store properties in local storage identified by \"config\" key", function () {
-console.log("debug4");
                 spyOn(localStorage, "setItem");
                 spyOn(JSON, "stringify").andReturn(JSON_PROPERTIES);
 
